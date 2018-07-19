@@ -1,0 +1,12 @@
+{
+  "classroom":"101",
+	"mqtt_host":"10.129.149.9",
+	"mqtt_port":1883,
+	"mqtt_keepalive":60,
+	"mqtt_topic_publish":"data/kresit/",
+  "mqtt_topic_publish":"reqs/kresit/",
+
+  "process":["abc","def"],
+  "service":["abc","def"]
+
+}
