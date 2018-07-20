@@ -1,1 +1,1 @@
-Dependencies : MQTT, JSON
+Dependencies : Paho-MQTT, JSON, 
