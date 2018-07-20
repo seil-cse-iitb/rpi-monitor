@@ -1,1 +1,3 @@
-Dependencies : Paho-MQTT, JSON, 
+Dependencies : Paho-MQTT, JSON,
+
+Please run the scipt in sudo mode

@@ -3,7 +3,7 @@ import os
 import socket
 import time
 import paho.mqtt.client as mqtt
-
+import thread
 
 conf=my_ip=mqtt_host=mqtt_port=mqtt_keepalive=mqtt_topic_publish=mqtt_qos=mqttc=interval=""
 rpi_stat={}
@@ -65,13 +65,35 @@ def publish_stat():
     mqttc.publish(mqtt_topic_publish+class_room+"service_stat",str(service_stat),mqtt_qos)
 
 
-def main():
+def collect():
     while(True):
         get_rpi_stat()
         get_process_stat()
         get_service_stat()
         publish_stat()
         time.sleep(interval)
+
+
+def request_handeler():
+    class_room="test"
+    def on_connect(client, userdata, flags, rc):
+        client.subscribe(mqtt_topic_req+class_room)
+
+    def on_message(client, userdata, msg):
+        print (msg.payload)
+        get_rpi_stat()
+        get_process_stat()
+        get_service_stat()
+        publish_stat()
+
+
+    client_sub = mqtt.Client(protocol=mqtt.MQTTv31)
+    client_sub.on_connect = on_connect
+    client_sub.on_message = on_message
+    client_sub.connect(mqtt_host,mqtt_port,mqtt_keepalive)
+    client_sub.loop_forever()
+
+
 
 
 if __name__ == "__main__":
@@ -87,9 +109,17 @@ if __name__ == "__main__":
     mqtt_port=conf['mqtt_port']
     mqtt_keepalive=conf['mqtt_keepalive']
     mqtt_topic_publish=conf['mqtt_topic_publish']
+    mqtt_topic_req=conf['mqtt_topic_req']
     mqtt_qos=conf['mqtt_qos']
     mqttc=mqtt.Client("Rpi-Monitor: "+str(my_ip))
     mqttc.connect(mqtt_host,mqtt_port,mqtt_keepalive)
 
-    
-    main()
+
+    try:
+        thread.start_new_thread(collect,())
+        thread.start_new_thread(request_handeler,())
+    except Exception as  e:
+        print(e)
+
+    while True:
+        pass
